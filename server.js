@@ -6,7 +6,7 @@ const cors = require('cors')
 app.use(cors());
 const options = {
     cors: {
-        origin: 'http://localhost:4200',
+        origin: 'https://powerful-tor-71258.herokuapp.com/',
     },
 };
 
