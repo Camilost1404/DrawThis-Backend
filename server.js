@@ -1,38 +1,47 @@
 const express = require('express');
 const app = express();
+const chalk = require('chalk');
+const cors = require('cors');
+
+app.use(cors());
+const options = {
+    cors: {
+    origin: 'http://localhost:4200',
+    },
+};
+
 const server = require('http').Server(app);
-const socketIo = require('socket.io')(server);
+const io = require('socket.io')(server, options);
 
 
-socketIo.on('connection', (socket) => {
 
-    //generar id cada que una persona se conecte
-    const idHandShake = socket.id;
+app.get('/', function (req, res) {
+    res.send('Hello World!');
+});
 
-    const { nameRoom } = socket.handshake.query;
 
-    console.log(`Dispositivo ${idHandShake} se unió a ${nameRoom}`);
 
-    // Unirlos a un grupo
-    socket.join();
+io.on('connection', function (socket) {
+
+    const handshake = socket.id;
+
+    let { nameRoom } = socket.handshake.query;
+    console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conentado a la ${nameRoom}`);
+    socket.join(nameRoom)
 
     socket.on('event', (res) => {
+    // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje   
+    socket.to(nameRoom).emit('event', res);
 
-        const data = res;
-        console.log(data);
-
-        socket.to(nameRoom).emit('event', data);
     })
 
 
-})
-
-app.set('port', process.env.PORT || 3000);
-
-if (process.env.NODE_ENV !== 'test') {
-    app.listen(app.get('port'), () => {
-        console.log('Server on port ' + app.get('port') + ' on dev');
+    socket.on('disconnect', function () {
+    console.log('user disconnected');
     });
-}
+});
 
-module.exports = app;
+server.listen(5000, function () {
+    console.log('\n')
+    console.log(`>> Socket listo y escuchando por el puerto: ${chalk.green('5000')}`)
+})
