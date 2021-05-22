@@ -1,7 +1,16 @@
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
-const socketIo = require('socket.io')(server);
+const cors = require('cors')
+
+app.use(cors());
+const options = {
+    cors: {
+        origin: 'http://localhost:4200',
+    },
+};
+
+const socketIo = require('socket.io')(server, options);
 
 
 socketIo.on('connection', (socket) => {
