@@ -10,6 +10,15 @@ const options = {
     },
 };
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "http://localhost:5000"); 
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method, Access-Control-Allow-Credentials');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
+});
+
 const server = require('http').Server(app);
 const io = require('socket.io')(server, options);
 
